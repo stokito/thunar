@@ -2784,10 +2784,32 @@ thunar_file_is_directory (const ThunarFile *file)
 gboolean
 thunar_file_is_archive (const ThunarFile *file)
 {
+  const gchar *content_type;
+  gchar *generic_icon_name;
+  gboolean file_is_archive;
+
   if (thunar_file_is_directory (file))
     return FALSE;
-  /* TODO */
-  return FALSE;
+
+  content_type = thunar_file_get_content_type (THUNAR_FILE (file));
+  if (content_type == NULL)
+  {
+    return FALSE;
+  }
+
+  /* If icon for the content is "package-x-generic" then the type is archive.
+   * GLib internally uses a shared-mime-info library to determine a content type and it's description.
+   * Unfortunately the shared-mime-info doesn't have a clear flag that the type is an archive.
+   * But all archive types (tar, zip, gz etc) always have the same icon "package-x-generic".
+   * So we can use the content type's icon name to determine that it is an archive or compressed file.
+   */
+  generic_icon_name = g_content_type_get_generic_icon_name (content_type);
+  if (generic_icon_name == NULL) {
+    return FALSE;
+  }
+  file_is_archive = g_strcmp0 (generic_icon_name, "package-x-generic") == 0;
+  g_free (generic_icon_name);
+  return file_is_archive;
 }
 
 
