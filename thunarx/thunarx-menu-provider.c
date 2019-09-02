@@ -40,10 +40,11 @@
  * fast as possible to method invokations by the file manager. That said, when
  * the file manager calls the thunarx_menu_provider_get_file_menu_items() or the
  * thunarx_menu_provider_get_folder_menu_items() method, the implementation in the
- * extension should use only the thunarx_file_info_has_mime_type() and
- * thunarx_file_info_is_directory() methods to determine the menu items that should
- * be added to the file manager's context menu. Don't perform any complicated I/O
- * to determine the menu items list, as that would block the whole file manager process.
+ * extension should use only the thunarx_file_info_has_mime_type(),
+ * thunarx_file_info_is_archive and thunarx_file_info_is_directory() methods
+ * to determine the menu items that should be added to the file manager's context menu.
+ * Don't perform any complicated I/O to determine the menu items list,
+ * as that would block the whole file manager process.
  *
  * The name of <link linkend="ThunarxMenuItem">ThunarxMenuItem</link>s returned from the
  * thunarx_menu_provider_get_file_menu_items() and thunarx_menu_provider_get_folder_menu_items()

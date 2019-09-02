@@ -291,6 +291,21 @@ thunarx_file_info_is_directory (ThunarxFileInfo *file_info)
   return (*THUNARX_FILE_INFO_GET_IFACE (file_info)->is_directory) (file_info);
 }
 
+/**
+ * thunarx_file_info_is_archive:
+ * @file_info : a #ThunarxFileInfo.
+ *
+ * Checks whether @file_info refers to an archive e.g. tar, zip, gz etc.
+ *
+ * Return value: %TRUE if @file_info is an archive.
+ **/
+gboolean
+thunarx_file_info_is_archive (ThunarxFileInfo *file_info)
+{
+  g_return_val_if_fail (THUNARX_IS_FILE_INFO (file_info), FALSE);
+  return (*THUNARX_FILE_INFO_GET_IFACE (file_info)->is_archive) (file_info);
+}
+
 
 
 /**

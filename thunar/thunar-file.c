@@ -96,6 +96,7 @@ static gchar             *thunar_file_info_get_mime_type       (ThunarxFileInfo 
 static gboolean           thunar_file_info_has_mime_type       (ThunarxFileInfo        *file_info,
                                                                 const gchar            *mime_type);
 static gboolean           thunar_file_info_is_directory        (ThunarxFileInfo        *file_info);
+static gboolean           thunar_file_info_is_archive          (ThunarxFileInfo        *file_info);
 static GFileInfo         *thunar_file_info_get_file_info       (ThunarxFileInfo        *file_info);
 static GFileInfo         *thunar_file_info_get_filesystem_info (ThunarxFileInfo        *file_info);
 static GFile             *thunar_file_info_get_location        (ThunarxFileInfo        *file_info);
@@ -394,6 +395,7 @@ thunar_file_info_init (ThunarxFileInfoIface *iface)
   iface->get_mime_type = thunar_file_info_get_mime_type;
   iface->has_mime_type = thunar_file_info_has_mime_type;
   iface->is_directory = thunar_file_info_is_directory;
+  iface->is_archive = thunar_file_info_is_archive;
   iface->get_file_info = thunar_file_info_get_file_info;
   iface->get_filesystem_info = thunar_file_info_get_filesystem_info;
   iface->get_location = thunar_file_info_get_location;
@@ -538,6 +540,14 @@ static gboolean
 thunar_file_info_is_directory (ThunarxFileInfo *file_info)
 {
   return thunar_file_is_directory (THUNAR_FILE (file_info));
+}
+
+
+
+static gboolean
+thunar_file_info_is_archive (ThunarxFileInfo *file_info)
+{
+  return thunar_file_is_archive (THUNAR_FILE (file_info));
 }
 
 
@@ -2759,6 +2769,25 @@ thunar_file_is_directory (const ThunarFile *file)
 {
   _thunar_return_val_if_fail (THUNAR_IS_FILE (file), FALSE);
   return file->kind == G_FILE_TYPE_DIRECTORY;
+}
+
+
+
+/**
+ * thunar_file_is_archive:
+ * @file : a #ThunarFile instance.
+ *
+ * Checks whether @file refers to an archive e.g. tar, zip, gz etc.
+ *
+ * Return value: %TRUE if @file is an archive.
+ **/
+gboolean
+thunar_file_is_archive (const ThunarFile *file)
+{
+  if (thunar_file_is_directory (file))
+    return FALSE;
+  /* TODO */
+  return FALSE;
 }
 
 

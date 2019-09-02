@@ -75,6 +75,7 @@ typedef struct _ThunarxFileInfo      ThunarxFileInfo;
  * @get_mime_type: See thunarx_file_info_get_mime_type().
  * @has_mime_type: See thunarx_file_info_has_mime_type().
  * @is_directory: See thunarx_file_info_is_directory().
+ * @is_archive: See thunarx_file_info_is_archive().
  * @get_file_info: See thunarx_file_info_get_file_info().
  * @get_filesystem_info: See thunarx_filesystem_info_get_filesystem_info().
  * @get_location: See thunarx_location_get_location().
@@ -104,6 +105,7 @@ struct _ThunarxFileInfoIface
                                      const gchar     *mime_type);
 
   gboolean   (*is_directory)        (ThunarxFileInfo *file_info);
+  gboolean   (*is_archive)          (ThunarxFileInfo *file_info);
 
   GFileInfo *(*get_file_info)       (ThunarxFileInfo *file_info);
   GFileInfo *(*get_filesystem_info) (ThunarxFileInfo *file_info);
@@ -142,6 +144,7 @@ gboolean   thunarx_file_info_has_mime_type       (ThunarxFileInfo *file_info,
                                                   const gchar     *mime_type);
 
 gboolean   thunarx_file_info_is_directory        (ThunarxFileInfo *file_info);
+gboolean   thunarx_file_info_is_archive          (ThunarxFileInfo *file_info);
 
 GFileInfo *thunarx_file_info_get_file_info       (ThunarxFileInfo *file_info);
 GFileInfo *thunarx_file_info_get_filesystem_info (ThunarxFileInfo *file_info);
