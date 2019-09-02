@@ -149,6 +149,7 @@ typedef enum
   THUNAR_FILE_FLAG_THUMB_MASK     = 0x03,   /* storage for ThunarFileThumbState */
   THUNAR_FILE_FLAG_IN_DESTRUCTION = 1 << 2, /* for avoiding recursion during destroy */
   THUNAR_FILE_FLAG_IS_MOUNTED     = 1 << 3, /* whether this file is mounted */
+  THUNAR_FILE_FLAG_IS_ARCHIVE     = 1 << 4, /* whether this file is an archive */
 }
 ThunarFileFlags;
 
@@ -972,6 +973,7 @@ thunar_file_info_clear (ThunarFile *file)
 
   /* set thumb state to unknown */
   FLAG_SET_THUMB_STATE (file, THUNAR_FILE_THUMB_STATE_UNKNOWN);
+  FLAG_UNSET (file, THUNAR_FILE_FLAG_IS_ARCHIVE);
 }
 
 
@@ -2784,10 +2786,8 @@ thunar_file_is_directory (const ThunarFile *file)
 gboolean
 thunar_file_is_archive (const ThunarFile *file)
 {
-  if (thunar_file_is_directory (file))
-    return FALSE;
-  /* TODO */
-  return FALSE;
+  _thunar_return_val_if_fail (THUNAR_IS_FILE (file), FALSE);
+  return FLAG_IS_SET(file, THUNAR_FILE_FLAG_IS_ARCHIVE);
 }
 
 
@@ -3783,7 +3783,34 @@ thunar_file_get_icon_name_for_state (const gchar         *icon_name,
   return icon_name;
 }
 
+/**
+ * thunar_determine_file_is_archive_by_icons:
+ * @file  : a #ThunarFile instance.
+ * @icon_names : the state of the @file<!---->s icon we are interested in.
+ *
+ * Determine that the file is an archive by icons for it's content type.
+ *
+ * If icon_names contains the "package-x-generic" icon then sets THUNAR_FILE_FLAG_IS_ARCHIVE flag.
+ **/
+static void
+thunar_determine_file_is_archive_by_icons (ThunarFile          *file,
+                                           const gchar * const *icon_names)
+{
+  guint i;
 
+  /* If there is "package-x-generic" icon for the file then it's type is an archive or a compressed file.
+   * GLib internally uses a shared-mime-info library to determine a content type and it's description.
+   * Unfortunately the shared-mime-info doesn't have a clear flag that the type is an archive.
+   * But all archive types (tar, zip, gz etc) always have the same icon "package-x-generic".
+   * So we can use the content type's icon name to determine that it is an archive or a compressed file.
+   */
+  for (i = 0; icon_names[i] != NULL; ++i)
+    if (g_strcmp0(icon_names[i], "package-x-generic") == 0)
+    {
+      FLAG_SET(file, THUNAR_FILE_FLAG_IS_ARCHIVE);
+      return;
+    }
+}
 
 /**
  * thunar_file_get_icon_name:
@@ -3913,6 +3940,7 @@ thunar_file_get_icon_name (ThunarFile          *file,
 
           if (G_LIKELY (names != NULL))
             {
+              thunar_determine_file_is_archive_by_icons (file, names);
               for (i = 0; names[i] != NULL; ++i)
                 if (*names[i] != '(' /* see gnome bug 688042 */
                     && gtk_icon_theme_has_icon (icon_theme, names[i]))
